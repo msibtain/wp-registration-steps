@@ -20,6 +20,7 @@
         ?>
 
         <table class="form-table">
+            
             <tbody>
                 <tr>
                     <th scope="row"><label for="blogname">Payment Mode</label></th>
