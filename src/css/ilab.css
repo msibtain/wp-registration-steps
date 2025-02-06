@@ -1,0 +1,41 @@
+
+/* Hide Next button */
+.elementor-field-type-next {
+	display: none;
+}
+
+.elementor-field-group-step9 .elementor-field-type-next,
+.elementor-field-group-step19 .elementor-field-type-next  {
+	display: block !important;
+}
+
+.elementor-field-option {
+	background-color: #ffffff;
+	transition: background-color 0.5s ease;
+}
+
+
+
+.elementor-field-option {
+	border: 1px solid #6EC1E4;
+	margin: 8px;
+	border-radius: 10px;
+	display: inline;
+	padding: 10px;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+.elementor-field-option:hover,
+.elementor-field-option.active {
+	background-color: #6EC1E4;
+}
+
+.elementor-field-option input {
+	float: right;
+	margin-top: 12px;
+}
+
+.elementor-field-option label {
+	float: left;
+}
