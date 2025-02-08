@@ -96,7 +96,7 @@ jQuery(document).ready(function($){
                     jQuery('#formErrors div.alert').html( '' );
                     jQuery('#formErrors').hide();
                     //alert('redirect');        
-                    window.location = "<?php echo get_permalink(827) ?>/?user=" + jQuery('#txtUsername').val() + "&vtype=" + jQuery('#txtVehicleType').val();
+                    window.location = "<?php echo get_permalink( get_option('ilab_stripe_payment_page') ) ?>/?user=" + jQuery('#txtUsername').val() + "&vtype=" + jQuery('#txtVehicleType').val();
                     //window.location = "https://5starregistration.com/registration-v2-step3/?user=" + jQuery('#txtUsername').val() + "&vtype=" + jQuery('#txtVehicleType').val();
                 }
                 else

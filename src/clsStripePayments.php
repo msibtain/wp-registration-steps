@@ -201,7 +201,7 @@ class clsStripePayments
             return new WP_REST_Response([
                 'success' => true, 
                 'message' => 'User added',
-                'success_url' => get_permalink(832)
+                'success_url' => get_permalink( get_option('ilab_stripe_payment_thankyoupage') )
             ], 200);   
 
         }
