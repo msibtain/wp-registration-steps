@@ -61,11 +61,25 @@ class wpRegistrationSteps
             update_user_meta($user_id, "bank_address", $data['bank_address']);
             update_user_meta($user_id, "bank_phone", $data['bank_phone']);
             update_user_meta($user_id, "bank_contact", $data['bank_contact']);
+            update_user_meta($user_id, "have_turn_signal", $data['have_turn_signal']);
 
+            if ( $this->loginWPUser( $user_id ) )
+            {
+                $this->addProductToCart( $data['vehicle_type'] );
 
-            echo json_encode([
-                'success' => true
-            ]);
+                echo json_encode([
+                    'success' => true
+                ]);
+            }
+            else
+            {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Something wrong with registration.'
+                ]);    
+            }
+
+            
         }
         else
         {
@@ -78,7 +92,75 @@ class wpRegistrationSteps
         exit();
     }
 
+    private function loginWPUser( $user_id )
+    {
+        $user = get_user_by('ID', $user_id);
     
+        if ($user) 
+        {
+            wp_set_current_user($user_id, $user->user_login);
+            wp_set_auth_cookie($user_id);
+            do_action('wp_login', $user->user_login, $user);
+            
+            return true;
+        } 
+        else 
+        {
+            return false;
+        }
+    }
+    
+    private function addProductToCart( $vType )
+    {
+        $product_id = "";
+
+        switch($vType)
+        {
+            case "standard_vehicle";
+                $product_id = 1107;
+                break;
+            case "utv";
+                $product_id = 1109;
+                break;
+            case "military_vehicle";
+                $product_id = 1110;
+                break;
+            case "boats";
+                $product_id = 1111;
+                break;
+            case "rv";
+                $product_id = 1112;
+                break;
+            case "motorcycle";
+                $product_id = 1113;
+                break;
+            case "trailer";
+                $product_id = 1114;
+                break;
+            case "commercial";
+                $product_id = 1115;
+                break;
+        }
+
+        if ($product_id)
+        {
+            $found = false;
+
+            foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) 
+            {
+                if ($cart_item['product_id'] == $product_id) {
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) 
+            {
+                WC()->cart->add_to_cart($product_id);
+            }
+        }
+    }
+
     private function check_and_register_user($email, $username, $password): int
     {
         // Check if the email already exists

@@ -35,7 +35,7 @@
         <div class="col-md-12">
             <label for="Address">Address</label>
             <br>
-            <textarea name="address" id="address" rows="8"></textarea>
+            <input type="text" name="address" id="address">
         </div>
     </div>
 
@@ -156,6 +156,16 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-6">
+            <label for="Bank Name">Do you have turn signals already to make your UTV street legal?</label>
+            <br>
+            <input type="radio" value="1" name="have_turn_signal" > Yes 
+            <input type="radio" value="0" name="have_turn_signal" > No
+        </div>
+        <div class="col-md-6"></div>
+    </div>
+
 <input type="hidden" id="txtVehicleType" name="vehicle_type">
 <input type="hidden" id="txtState" name="state">
 
@@ -166,3 +176,33 @@
 <div id="formData"></div>
 
 </form>
+
+<script>
+    
+    
+document.addEventListener("DOMContentLoaded", function () {
+    function initAutocomplete() {
+        var input = document.getElementById("address");
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+        // Optionally, restrict results to a specific country
+        autocomplete.setComponentRestrictions({ 'country': ['us'] });
+
+        // Listen for address selection
+        autocomplete.addListener("place_changed", function () {
+            var place = autocomplete.getPlace();
+            if (!place.geometry) {
+                console.log("No details available for input: '" + input.value + "'");
+                return;
+            }
+            console.log("Selected address:", place.formatted_address);
+        });
+    }
+
+    initAutocomplete();
+});
+
+    // hideSteps();
+    
+
+</script>

@@ -1,3 +1,5 @@
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQfz8co0YKL0xDsfWNYzYg7hMP6R72I7E&libraries=places"></script>
+
 <style>
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-v4-grid-only@1.0.0/dist/bootstrap-grid.min.css');
 
@@ -69,6 +71,10 @@ jQuery(document).ready(function($){
 
         var vtype = jQuery(this).data('type');
         jQuery('#txtVehicleType').val( vtype );
+
+        jQuery('#step'+current_step).hide();
+        current_step++;
+        jQuery('#step'+current_step).show();
         
     });
 
@@ -96,7 +102,15 @@ jQuery(document).ready(function($){
                     jQuery('#formErrors div.alert').html( '' );
                     jQuery('#formErrors').hide();
                     //alert('redirect');        
-                    window.location = "<?php echo get_permalink( get_option('ilab_stripe_payment_page') ) ?>/?user=" + jQuery('#txtUsername').val() + "&vtype=" + jQuery('#txtVehicleType').val();
+                    if ( jQuery('input[name="have_turn_signal"]:checked').val() === "0" )
+                    {
+                        window.location = "<?php echo get_permalink(979); // Turn Signal Kit product ?>";
+                    }
+                    else
+                    {
+                        window.location = "<?php echo wc_get_checkout_url(); // Checkout page ?>";
+                    }
+                    // window.location = "<?php //echo get_permalink( get_option('ilab_stripe_payment_page') ) ?>/?user=" + jQuery('#txtUsername').val() + "&vtype=" + jQuery('#txtVehicleType').val();
                     //window.location = "https://5starregistration.com/registration-v2-step3/?user=" + jQuery('#txtUsername').val() + "&vtype=" + jQuery('#txtVehicleType').val();
                 }
                 else
@@ -111,4 +125,15 @@ jQuery(document).ready(function($){
     });
 
 });    
+
+function hideSteps()
+{
+    var steps = jQuery('.steps');
+    jQuery.each(steps, function(){
+        if (jQuery(this).attr('id') != "step1")
+        {
+            jQuery(this).hide();
+        }
+    });
+}
 </script>
