@@ -1,4 +1,4 @@
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQfz8co0YKL0xDsfWNYzYg7hMP6R72I7E&libraries=places"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo get_option("google_map_api_key"); ?>&libraries=places"></script>
 
 <style>
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-v4-grid-only@1.0.0/dist/bootstrap-grid.min.css');
