@@ -1,9 +1,10 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo get_option("google_map_api_key"); ?>&libraries=places"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-v4-grid-only@1.0.0/dist/bootstrap-grid.min.css');
 
-.steps:not(#step1) {
+.steps:not(#step1),
+#stsregloader {
     display: none;
 }
 #sel_state_callback {
@@ -86,7 +87,9 @@ jQuery(document).ready(function($){
 
     jQuery('#frmUserDetail').on('submit', function(e){
         e.preventDefault();
-        
+
+        jQuery('#stsregloader').show();
+
         /* validations here */
         jQuery.ajax({
             url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
@@ -96,15 +99,40 @@ jQuery(document).ready(function($){
             },
             success: function(response){
                 var r = JSON.parse( response );
-
+                jQuery('#stsregloader').hide();
                 if (r.success == true)
                 {
+                    fbq('track', 'Lead', {
+                        user_data: {
+                            email: r.user_data.email,
+                            phone: r.user_data.phone,      
+                            first_name: r.user_data.first_name,
+                            last_name: r.user_data.last_name
+                        }
+                    });
+
                     jQuery('#formErrors div.alert').html( '' );
                     jQuery('#formErrors').hide();
                     //alert('redirect');        
                     if ( jQuery('input[name="have_turn_signal"]:checked').val() === "0" )
                     {
-                        window.location = "<?php echo get_permalink(979); // Turn Signal Kit product ?>";
+                        Swal.fire({
+                            title: "Shop",
+                            text: "Shop our industry leading turn signal kits?",
+                            icon: "info",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Yes",
+                            cancelButtonText: "No"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location = "<?php echo get_permalink(979); // Turn Signal Kit product ?>";
+                            } else {
+                                window.location = "<?php echo wc_get_checkout_url(); // Checkout page ?>";
+                            }
+                        });
+                        
                     }
                     else
                     {

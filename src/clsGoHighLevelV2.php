@@ -4,12 +4,14 @@ class clsGoHighLevelV2
     private string $ghl_api_url;
     private string $ghl_api_key;
     private string $ghl_workflow_id;
+    private string $ghl_location_id;
 
     function __construct()
     {
         $this->ghl_api_url = "https://rest.gohighlevel.com/v1";
         $this->ghl_api_key = get_option("ghl_api_key");
         $this->ghl_workflow_id = get_option("ghl_workflow_id");
+        $this->ghl_location_id = get_option("ghl_location_id");
 
         add_action("ilab_user_registered_step1", [$this, "ilab_create_contact_ghl"]);
     }
@@ -20,8 +22,10 @@ class clsGoHighLevelV2
         $user_email     = $objUser->user_email;
         $display_name   = $objUser->display_name;
         $phone_number   = get_user_meta($user_id, "phone_number", true);
+        $first_name     = get_user_meta($user_id, "first_name", true);
+        $last_name      = get_user_meta($user_id, "last_name", true);
 
-        $strContactId = $this->createContact($display_name, $user_email, $phone_number);
+        $strContactId = $this->createContact($first_name, $last_name, $user_email, $phone_number);
         $workflowId = ($this->ghl_workflow_id) ?? null;
         if ($strContactId !== false && $workflowId !== null)
         {
@@ -30,17 +34,19 @@ class clsGoHighLevelV2
 
     }
 
-    function createContact(string $name, string $email, string $phone)
+    function createContact(string $first_name, string $last_name, string $email, string $phone)
     {
         $api_url = $this->ghl_api_url . "/contacts/";
         $api_key = $this->ghl_api_key;
 
-        $arrName = explode(" ", $name);
+        $phone = str_replace("+1", "", $phone);
+
         $data = [
-            "firstName" => @$arrName[0],
-            "lastName" => @$arrName[1],
+            "firstName" => $first_name,
+            "lastName" => $last_name,
             "email" => $email,
-            "phone" => $phone
+            "phone" => $phone,
+            "locationId" => $this->ghl_location_id
         ];
 
         $ch = curl_init($api_url);

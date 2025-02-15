@@ -6,9 +6,14 @@ class wpRegistrationSteps
         add_shortcode('ilab-steps-script', [$this, 'ilab_steps_script']);
         add_shortcode('ilab-sel-states', [$this, 'ilab_sel_states']);
         add_shortcode('ilab-user-detail-form', [$this, 'ilab_user_detail_form']);
+        add_shortcode('ilab-checkout-autofill', [$this, 'ilab_checkout_autofill']);
+        add_action('woocommerce_thankyou', [$this, 'ilab_wc_thankyou_scripts'], 10, 1);
 
         add_action( 'wp_ajax_ilab_user_detail_submit', [$this, 'ilab_user_detail_submit'] );
         add_action( 'wp_ajax_nopriv_ilab_user_detail_submit', [$this, 'ilab_user_detail_submit'] );
+
+        add_action( 'wp_ajax_ilab_get_user_data', [$this, 'ilab_get_user_data'] );
+        add_action( 'wp_ajax_nopriv_ilab_get_user_data', [$this, 'ilab_get_user_data'] );
     }
 
     function ilab_steps_script()
@@ -41,8 +46,6 @@ class wpRegistrationSteps
 
         if ($user_id > 0)
         {
-            do_action("ilab_user_registered_step1", $user_id);
-
             update_user_meta($user_id, "first_name", $data['first_name']);
             update_user_meta($user_id, "last_name", $data['last_name']);
             update_user_meta($user_id, "vehicle_type", $data['vehicle_type']);
@@ -63,12 +66,20 @@ class wpRegistrationSteps
             update_user_meta($user_id, "bank_contact", $data['bank_contact']);
             update_user_meta($user_id, "have_turn_signal", $data['have_turn_signal']);
 
+            do_action("ilab_user_registered_step1", $user_id);
+
             if ( $this->loginWPUser( $user_id ) )
             {
                 $this->addProductToCart( $data['vehicle_type'] );
 
                 echo json_encode([
-                    'success' => true
+                    'success' => true,
+                    'user_data' => [
+                        'email' => $data['email'],
+                        'phone' => $data['phone_number'],
+                        'first_name' => $data['first_name'],
+                        'last_name' => $data['last_name']
+                    ]
                 ]);
             }
             else
@@ -179,6 +190,60 @@ class wpRegistrationSteps
         return $user_id;
     }
 
+    function ilab_checkout_autofill()
+    {
+        ob_start();
+        include('views/checkout_form_autofill.php');
+        return ob_get_clean();
+    }
+
+    function ilab_get_user_data()
+    {
+        $user_id = get_current_user_id();
+
+        if ($user_id > 0)
+        {
+            echo json_encode([
+                'success' => true,
+                'user' => [
+                    'first_name' => get_user_meta($user_id, "first_name", true),
+                    'last_name' => get_user_meta($user_id, "last_name", true),
+                    'address' => get_user_meta($user_id, "address", true),
+                    'phone_number' => get_user_meta($user_id, "phone_number", true),
+                ]
+            ]);
+        }
+        else
+        {
+            echo json_encode([
+                'success' => false,
+                'message' => 'No user is logged in.'
+            ]);
+        }
+        
+
+        exit;
+    }
+
+    function ilab_wc_thankyou_scripts( $order_id )
+    {
+        $order = wc_get_order($order_id);
+        $email = $order->get_billing_email();
+
+        ob_start();
+        ?>
+        <script>
+            fbq('track', 'Purchase', {
+                value: "<?php echo ($order->get_total()); ?>",
+                currency: "USD",
+                user_data: {
+                    email: "<?php echo $email; ?>"
+                }
+            });
+        </script>
+        <?php
+        echo ob_get_clean();
+    }
 
 }
 

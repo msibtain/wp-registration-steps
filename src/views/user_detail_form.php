@@ -119,8 +119,8 @@
         <div class="col-md-6">
             <label>Are you paying cash for the vehicle?</label>
             <br>
-            <input type="radio" value="1" name="paying_cash" onclick="jQuery('#bank_details_wrapper').show();"> Yes 
-            <input type="radio" value="0" name="paying_cash" onclick="jQuery('#bank_details_wrapper').hide();"> No
+            <input type="radio" value="1" name="paying_cash" onclick="jQuery('#bank_details_wrapper').hide();"> Yes 
+            <input type="radio" value="0" name="paying_cash" onclick="jQuery('#bank_details_wrapper').show();"> No
         </div>
     </div>
 
