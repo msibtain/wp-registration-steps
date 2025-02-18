@@ -127,7 +127,18 @@ jQuery(document).ready(function($){
                             cancelButtonText: "No"
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location = "<?php echo get_permalink(979); // Turn Signal Kit product ?>";
+                                <?php
+                                if (isset($_GET['ts']) && $_GET['ts'] === "1")
+                                {
+                                    $turn_signal_page = add_query_arg(['tsr'=>1], get_permalink(979));
+                                }
+                                else
+                                {
+                                    $turn_signal_page = get_permalink(979);
+                                }
+
+                                ?>
+                                window.location = "<?php echo $turn_signal_page; // Turn Signal Kit product ?>";
                             } else {
                                 window.location = "<?php echo wc_get_checkout_url(); // Checkout page ?>";
                             }

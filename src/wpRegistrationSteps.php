@@ -8,6 +8,8 @@ class wpRegistrationSteps
         add_shortcode('ilab-user-detail-form', [$this, 'ilab_user_detail_form']);
         add_shortcode('ilab-checkout-autofill', [$this, 'ilab_checkout_autofill']);
         add_action('woocommerce_thankyou', [$this, 'ilab_wc_thankyou_scripts'], 10, 1);
+        add_action('woocommerce_after_add_to_cart_button', [$this, 'ilab_custom_registration_button'] );
+        add_action('wp_enqueue_scripts', [$this, 'ilab_enqueue_script']);
 
         add_action( 'wp_ajax_ilab_user_detail_submit', [$this, 'ilab_user_detail_submit'] );
         add_action( 'wp_ajax_nopriv_ilab_user_detail_submit', [$this, 'ilab_user_detail_submit'] );
@@ -243,6 +245,23 @@ class wpRegistrationSteps
         </script>
         <?php
         echo ob_get_clean();
+    }
+
+    function ilab_custom_registration_button()
+    {
+        ob_start();
+        include('views/register_button.php');
+        echo ob_get_clean();
+    }
+
+    function ilab_enqueue_script()
+    {
+        wp_register_script(
+            'sweet-alert',
+            'https://cdn.jsdelivr.net/npm/sweetalert2@11',
+            [],
+            '1.0.0'
+        );
     }
 
 }
