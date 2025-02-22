@@ -16,6 +16,8 @@ class wpRegistrationSteps
 
         add_action( 'wp_ajax_ilab_get_user_data', [$this, 'ilab_get_user_data'] );
         add_action( 'wp_ajax_nopriv_ilab_get_user_data', [$this, 'ilab_get_user_data'] );
+
+        add_action( 'wc_stripe_order_payment_complete', [$this, 'ilab_wc_stripe_order_payment_complete'], 10, 2);
     }
 
     function ilab_steps_script()
@@ -262,6 +264,17 @@ class wpRegistrationSteps
             [],
             '1.0.0'
         );
+    }
+
+    function ilab_wc_stripe_order_payment_complete($charge, $order)
+    {
+        $customer_id    = $charge->customer;
+        $payment_method = $charge->payment_method;
+        $wp_user_id     = $order->get_customer_id();
+
+        update_user_meta($wp_user_id, "stripe_customer_id", $customer_id);
+        update_user_meta($wp_user_id, "stripe_payment_method", $payment_method);        
+
     }
 
 }

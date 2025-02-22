@@ -9,35 +9,55 @@ class clsStripePayments
     function __construct()
     {
 
-        add_action("init", [$this, "ilab_setup_stripe_keys"]);
+        // add_action("init", [$this, "ilab_setup_stripe_keys"]);
 
-        add_action('rest_api_init', function () {
-            register_rest_route('stripe', '/ilabwebhook/', array(
-                'methods' => 'POST',
-                'callback' => [$this, 'es_stripe_wewbhook'],
-                'permission_callback' => '__return_true'
-            ));
-        });
+        // add_action('rest_api_init', function () {
+        //     register_rest_route('stripe', '/ilabwebhook/', array(
+        //         'methods' => 'POST',
+        //         'callback' => [$this, 'es_stripe_wewbhook'],
+        //         'permission_callback' => '__return_true'
+        //     ));
+        // });
 
-        add_action('rest_api_init', function () {
-            register_rest_route('stripe', '/pi/', array(
-                'methods' => 'POST',
-                'callback' => [$this, 'stripe_payment_intent'],
-                'permission_callback' => '__return_true'
-            ));
-        });
+        // add_action('rest_api_init', function () {
+        //     register_rest_route('stripe', '/pi/', array(
+        //         'methods' => 'POST',
+        //         'callback' => [$this, 'stripe_payment_intent'],
+        //         'permission_callback' => '__return_true'
+        //     ));
+        // });
 
-        add_action('rest_api_init', function () {
-            register_rest_route('customer', '/update/', array(
-                'methods' => 'POST',
-                'callback' => [$this, 'wp_updte_user'],
-                'permission_callback' => '__return_true'
-            ));
-        });
+        // add_action('rest_api_init', function () {
+        //     register_rest_route('customer', '/update/', array(
+        //         'methods' => 'POST',
+        //         'callback' => [$this, 'wp_updte_user'],
+        //         'permission_callback' => '__return_true'
+        //     ));
+        // });
 
-        add_action('wp_enqueue_scripts', [$this, 'ilab_wp_scripts']);
-        add_shortcode('ilab_stripe_payment_form', [$this, 'ilab_stripe_payment_form']);
+        // add_action('wp_enqueue_scripts', [$this, 'ilab_wp_scripts']);
+        // add_shortcode('ilab_stripe_payment_form', [$this, 'ilab_stripe_payment_form']);
+
+        add_filter( 'wc_stripe_payment_intent_args', [$this, 'ilab_wc_stripe_payment_intent_args']);
         
+    }
+
+    function ilab_wc_stripe_payment_intent_args( $args )
+    {
+        unset( $args['confirmation_method'] );
+        unset( $args['payment_method_types'] );
+        
+        $args['automatic_payment_methods'] = [
+                'enabled' => 'true',
+        ];
+
+        $args['payment_method_options'] = [
+                'card' => [
+                    'setup_future_usage' => 'off_session',
+                ],
+        ];
+
+        return $args;
     }
 
     function ilab_setup_stripe_keys()
@@ -211,7 +231,10 @@ class clsStripePayments
 
     function stripe_customer_charge( $amount, $customer_id, $payment_method_id )
     {
-        \Stripe\Stripe::setApiKey( $this->stripe_secret  );
+        $mode = wc_stripe_mode();
+        $stripe_key = stripe_wc()->api_settings->get_option( "secret_key_{$mode}" );
+
+        \Stripe\Stripe::setApiKey( $stripe_key  );
 
         try {
 
