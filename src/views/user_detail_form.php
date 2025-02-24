@@ -33,9 +33,19 @@
 
     <div class="row">
         <div class="col-md-12">
-            <label for="Address">Address</label>
+            <label for="Address">Billing Address</label>
             <br>
             <input type="text" name="address" id="address">
+        </div>
+    </div>
+
+    <br>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <label for="Address">Mailing Address</label>
+            <br>
+            <input type="text" name="mailing_address" id="mailing_address">
         </div>
     </div>
 
@@ -200,6 +210,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     initAutocomplete();
+
+    function initAutoCompleteMailingAddress() {
+        var input = document.getElementById("mailing_address");
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+        // Optionally, restrict results to a specific country
+        autocomplete.setComponentRestrictions({ 'country': ['us'] });
+
+        // Listen for address selection
+        autocomplete.addListener("place_changed", function () {
+            var place = autocomplete.getPlace();
+            if (!place.geometry) {
+                console.log("No details available for input: '" + input.value + "'");
+                return;
+            }
+            console.log("Selected address:", place.formatted_address);
+        });
+    }
+
+    initAutoCompleteMailingAddress();
 });
 
     // hideSteps();
