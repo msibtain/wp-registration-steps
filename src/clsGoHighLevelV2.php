@@ -39,7 +39,7 @@ class clsGoHighLevelV2
         $strContactId = $this->createContact(
             $first_name, 
             $last_name, 
-            $user_email, 
+            $customer_email, 
             $customer_phone,
             $address1,
             $city,
