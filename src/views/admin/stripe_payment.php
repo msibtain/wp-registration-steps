@@ -3,13 +3,9 @@ global $clsStripePayments, $clsWpAdmin;
 $user_id = $_GET['user_id'];
 $objUser = get_user_by("ID", $user_id);
 $strCustomerID = get_user_meta($user_id, "stripe_customer_id", true);
-$strPaymentMethodID = get_user_meta($user_id, "stripe_payment_method", true);
+//$strPaymentMethodID = get_user_meta($user_id, "stripe_payment_method", true);
+$strPaymentMethodID = '';
 
-//echo $stripe->get_test_key();
-//echo $stripe->get_test_secret( true );
-
-//echo $stripe->get_live_key();
-//echo $stripe->get_live_secret( true );
 
 ?>
 <div class="wrap">
@@ -20,6 +16,10 @@ $strPaymentMethodID = get_user_meta($user_id, "stripe_payment_method", true);
     {
         if ($_POST)
         {
+            if ( !$strPaymentMethodID )
+            {
+                $strPaymentMethodID = $clsStripePayments->stripe_customer_payment_method( $strCustomerID );
+            }
             $response = $clsStripePayments->stripe_customer_charge( $_POST['amount'], $strCustomerID, $strPaymentMethodID );
             $clsWpAdmin->addUserPaymentHistory( $_POST['amount'], $response, $user_id );
             ?>

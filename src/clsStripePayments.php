@@ -44,6 +44,7 @@ class clsStripePayments
 
     function ilab_wc_stripe_payment_intent_args( $args )
     {
+        /*
         unset( $args['confirmation_method'] );
         unset( $args['payment_method_types'] );
         
@@ -56,6 +57,9 @@ class clsStripePayments
                     'setup_future_usage' => 'off_session',
                 ],
         ];
+        */
+
+        $args['setup_future_usage'] = 'off_session';
 
         return $args;
     }
@@ -227,6 +231,23 @@ class clsStripePayments
         }
         
         
+    }
+
+    function stripe_customer_payment_method( $customer_id )
+    {
+        $mode = wc_stripe_mode();
+        $stripe_key = stripe_wc()->api_settings->get_option( "secret_key_{$mode}" );
+
+        //\Stripe\Stripe::setApiKey( $stripe_key  );
+        $stripe = new \Stripe\StripeClient( $stripe_key );
+
+        $paymentMethods = $stripe->paymentMethods->all([
+            'customer' => $customer_id,
+            'type' => 'card',
+        ]);
+
+        
+        return (isset($paymentMethods->data[0]->id)) ? $paymentMethods->data[0]->id : '';
     }
 
     function stripe_customer_charge( $amount, $customer_id, $payment_method_id )
